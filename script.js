@@ -206,4 +206,51 @@ function gameLoop() {
         powerUps.push(new PowerUp());
     }
 
-    powerUps.for
+    powerUps.forEach((powerUp, index) => {
+        powerUp.draw();
+        powerUp.update();
+
+        // Check for collision with player
+        if (powerUp.x < player.x + player.width &&
+            powerUp.x + powerUp.width > player.x &&
+            powerUp.y < player.y + player.height &&
+            powerUp.y + powerUp.height > player.y) {
+
+            if (powerUp.type === "speed") {
+                player.speed += 2; // Increase player speed
+            } else if (powerUp.type === "health") {
+                player.health += 1; // Increase player health
+            }
+
+            powerUps.splice(index, 1); // Remove power-up
+        }
+
+        // Remove off-screen power-ups
+        if (powerUp.y > canvas.height) {
+            powerUps.splice(index, 1);
+        }
+    });
+
+    // Update score display
+    document.getElementById("score-board").textContent = `Score: ${score}`;
+}
+
+// Pause the game
+function togglePause() {
+    gamePaused = !gamePaused;
+    if (gamePaused) {
+        clearInterval(gameLoopInterval);
+    } else {
+        gameLoopInterval = setInterval(gameLoop, 1000 / 60);
+    }
+}
+
+// Restart the game
+function restartGame() {
+    document.getElementById("game-over").style.display = "none";
+    document.getElementById("restart-button").style.display = "none";
+    startGame();
+}
+
+// Start the game
+startGame();
