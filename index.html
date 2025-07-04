@@ -8,31 +8,36 @@
 </head>
 <body>
     <div id="app">
+        <!-- Sidebar for navigation -->
         <div id="sidebar">
-            <div id="user-list">
-                <h3>Users</h3>
+            <div id="sidebar-header">
+                <h3>Channels</h3>
+            </div>
+            <div id="channel-list">
                 <ul>
-                    <li>User1</li>
-                    <li>User2</li>
-                    <li>User3</li>
+                    <li class="channel" onclick="selectChannel('general')">#general</li>
+                    <li class="channel" onclick="selectChannel('random')">#random</li>
+                    <li class="channel" onclick="selectChannel('help')">#help</li>
                 </ul>
             </div>
         </div>
-        
-        <div id="chat-container">
+
+        <!-- Chat Window -->
+        <div id="chat-window">
             <div id="chat-header">
-                <h2>General Chat</h2>
+                <h2>#general</h2>
             </div>
             <div id="messages">
                 <!-- Messages will go here -->
             </div>
             <div id="chat-input">
-                <input type="text" id="message-input" placeholder="Type a message...">
+                <input type="text" id="message-input" placeholder="Type a message..." />
                 <button id="send-button">Send</button>
             </div>
         </div>
     </div>
-    
+
+    <script src="/socket.io/socket.io.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
