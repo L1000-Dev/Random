@@ -1,27 +1,36 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const sendButton = document.getElementById('send-button');
-    const messageInput = document.getElementById('message-input');
-    const messagesContainer = document.getElementById('messages');
-    
-    sendButton.addEventListener('click', sendMessage);
-    
-    // Send message when "Enter" is pressed
-    messageInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            sendMessage();
-        }
-    });
+const socket = io();
 
-    function sendMessage() {
-        const messageText = messageInput.value.trim();
-        
-        if (messageText !== "") {
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message');
-            messageElement.textContent = messageText;
-            messagesContainer.appendChild(messageElement);
-            messageInput.value = ""; // Clear the input after sending
-            messagesContainer.scrollTop = messagesContainer.scrollHeight; // Scroll to the bottom
-        }
+// DOM Elements
+const messageInput = document.getElementById('message-input');
+const sendButton = document.getElementById('send-button');
+const messagesContainer = document.getElementById('messages');
+let currentChannel = 'general';
+
+// Select Channel
+function selectChannel(channel) {
+    currentChannel = channel;
+    document.getElementById('chat-header').textContent = `#${channel}`;
+    messagesContainer.innerHTML = ''; // Clear previous messages
+
+    // Emit an event to join the selected channel
+    socket.emit('joinChannel', channel);
+}
+
+// Send Message
+sendButton.addEventListener('click', () => {
+    const message = messageInput.value.trim();
+    if (message !== "") {
+        // Emit the message to the server
+        socket.emit('sendMessage', { channel: currentChannel, message: message });
+        messageInput.value = ''; // Clear input
     }
+});
+
+// Listen for incoming messages
+socket.on('newMessage', (data) => {
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('message');
+    messageElement.textContent = `${data.user}: ${data.message}`;
+    messagesContainer.appendChild(messageElement);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight; // Scroll to bottom
 });
