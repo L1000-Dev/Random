@@ -3,197 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clicker Game</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #1c1c1c;
-            color: #fff;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
-
-        #game-container {
-            padding: 20px;
-            margin-top: 50px;
-        }
-
-        #score {
-            font-size: 2rem;
-            margin: 20px 0;
-        }
-
-        #click-btn {
-            font-size: 30px;
-            padding: 20px 40px;
-            background-color: #ff6f61;
-            border: none;
-            color: white;
-            cursor: pointer;
-            border-radius: 10px;
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        #click-btn:hover {
-            background-color: #ff9a8b;
-        }
-
-        .upgrade {
-            background-color: #62b88f;
-            padding: 15px;
-            margin-top: 20px;
-            cursor: pointer;
-            font-size: 20px;
-            border-radius: 5px;
-            width: 200px;
-            margin: 10px auto;
-        }
-
-        .upgrade:hover {
-            background-color: #9ae6c8;
-        }
-
-        #auto-clicker-upgrade {
-            background-color: #a62c8b;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        #game-over {
-            font-size: 40px;
-            color: red;
-            display: none;
-        }
-
-    </style>
+    <title>Discord Clone</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
-    <div id="game-container">
-        <h1>Clicker Game</h1>
-        <div id="score">Score: 0</div>
-        <button id="click-btn">Click Me!</button>
-
-        <div id="upgrades">
-            <div class="upgrade" id="click-upgrade">Increase Points per Click (Cost: 10)</div>
-            <div class="upgrade hidden" id="auto-clicker-upgrade">Buy Auto Clicker (Cost: 50)</div>
+    <div id="app">
+        <div id="sidebar">
+            <div id="user-list">
+                <h3>Users</h3>
+                <ul>
+                    <li>User1</li>
+                    <li>User2</li>
+                    <li>User3</li>
+                </ul>
+            </div>
         </div>
-
-        <div id="game-over" class="hidden">
-            <p>Game Over! You reached the maximum score!</p>
-            <button onclick="resetGame()">Restart</button>
+        
+        <div id="chat-container">
+            <div id="chat-header">
+                <h2>General Chat</h2>
+            </div>
+            <div id="messages">
+                <!-- Messages will go here -->
+            </div>
+            <div id="chat-input">
+                <input type="text" id="message-input" placeholder="Type a message...">
+                <button id="send-button">Send</button>
+            </div>
         </div>
     </div>
-
-    <script>
-        // Game Variables
-        let score = 0;
-        let pointsPerClick = 1;
-        let autoClickerActive = false;
-        let autoClickerInterval;
-        let clickUpgradeCost = 10;
-        let autoClickerCost = 50;
-        let clickUpgradeMultiplier = 2;
-        let maxScore = 1000; // The max score to stop the game
-
-        // DOM Elements
-        const scoreElement = document.getElementById('score');
-        const clickButton = document.getElementById('click-btn');
-        const clickUpgradeButton = document.getElementById('click-upgrade');
-        const autoClickerUpgrade = document.getElementById('auto-clicker-upgrade');
-        const gameOverMessage = document.getElementById('game-over');
-
-        // Load saved data from localStorage
-        const savedData = JSON.parse(localStorage.getItem('clickerGame')) || {};
-
-        // Apply saved data to the game
-        if (savedData.score) {
-            score = savedData.score;
-        }
-        if (savedData.pointsPerClick) {
-            pointsPerClick = savedData.pointsPerClick;
-        }
-        if (savedData.autoClickerActive) {
-            autoClickerActive = savedData.autoClickerActive;
-        }
-
-        // Function to save game data to localStorage
-        function saveGame() {
-            const gameData = {
-                score: score,
-                pointsPerClick: pointsPerClick,
-                autoClickerActive: autoClickerActive
-            };
-            localStorage.setItem('clickerGame', JSON.stringify(gameData));
-        }
-
-        // Update score display
-        function updateScore() {
-            scoreElement.textContent = `Score: ${score}`;
-            saveGame();
-
-            if (score >= maxScore) {
-                gameOver();
-            }
-        }
-
-        // Click button action
-        clickButton.addEventListener('click', () => {
-            score += pointsPerClick;
-            updateScore();
-        });
-
-        // Handle Click Upgrade
-        clickUpgradeButton.addEventListener('click', () => {
-            if (score >= clickUpgradeCost) {
-                score -= clickUpgradeCost;
-                pointsPerClick *= clickUpgradeMultiplier;
-                clickUpgradeCost *= 1.5; // Increase the cost for the next upgrade
-                updateScore();
-                clickUpgradeButton.textContent = `Increase Points per Click (Cost: ${Math.floor(clickUpgradeCost)})`;
-            }
-        });
-
-        // Handle Auto Clicker Upgrade
-        autoClickerUpgrade.addEventListener('click', () => {
-            if (score >= autoClickerCost && !autoClickerActive) {
-                score -= autoClickerCost;
-                autoClickerActive = true;
-                autoClickerInterval = setInterval(() => {
-                    score += pointsPerClick;
-                    updateScore();
-                }, 1000); // Auto-click every second
-                updateScore();
-                autoClickerUpgrade.classList.add('hidden'); // Hide the auto-clicker upgrade button after purchase
-            }
-        });
-
-        // Handle Game Over
-        function gameOver() {
-            clearInterval(autoClickerInterval);
-            gameOverMessage.classList.remove('hidden');
-            clickButton.disabled = true; // Disable the click button when game is over
-        }
-
-        // Reset Game
-        function resetGame() {
-            score = 0;
-            pointsPerClick = 1;
-            autoClickerActive = false;
-            clickUpgradeCost = 10;
-            autoClickerCost = 50;
-            gameOverMessage.classList.add('hidden');
-            clickButton.disabled = false; // Enable the click button again
-            updateScore();
-            autoClickerUpgrade.classList.remove('hidden'); // Show the auto-clicker upgrade button
-        }
-
-        // Update UI on startup
-        updateScore();
-
-    </script>
+    
+    <script src="script.js"></script>
 </body>
 </html>
